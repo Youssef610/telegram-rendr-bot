@@ -1,7 +1,7 @@
 import telebot
 import requests
 
-bot = telebot.TeleBot('6103551301:AAFWQCycnoSZ2JCIZmS2JtNGfhQP05bg2Jw')
+bot = telebot.TeleBot('6673789871:AAGf-6reiWsjEHgYtXjlW0SDoh-8pKeaWJw')
 
 # Dictionary to store the processing status for each user ID
 processing_status = {}
