@@ -50,7 +50,7 @@ def reply(message):
             return
 
         
-        bot.reply_to(message, "Wait....")
+        bot.reply_to(message, "استني....")
 
         x = message.text
         if " "in x:
