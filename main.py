@@ -2,6 +2,8 @@ import telebot
 import requests
 import time
 import os
+from keep_alive import keep_alive
+keep_alive()
 bot_token = '6673789871:AAGf-6reiWsjEHgYtXjlW0SDoh-8pKeaWJw'
 bot = telebot.TeleBot(bot_token)
 
