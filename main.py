@@ -22,7 +22,7 @@ def find_valid_id(base_number, code,start):
             print(f'Fail: {generated_value}')
 
         if i % 10 == 0:
-            os.system('cls')
+            os.system('clear')
             time.sleep(5)
             
 
